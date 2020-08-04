@@ -1,14 +1,7 @@
 const { ApolloServer, gql } = require("apollo-server");
 const { v1: uuidv1 } = require("uuid");
 
-// A schema is a collection of type definitions (hence "typeDefs")
-// that together define the "shape" of queries that are executed against
-// your data.
 const typeDefs = gql`
-  # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
-
-  # This "Book" type defines the queryable fields for every book in our data source.
-
   type Desert {
     id: ID
     name: String
@@ -18,9 +11,6 @@ const typeDefs = gql`
     protein: Int
   }
 
-  # The "Query" type is special: it lists all of the available queries that
-  # clients can execute, along with the return type for each. In this
-  # case, the "books" query returns an array of zero or more Books (defined above).
   type Query {
     getSortedDeserts(key: String): [Desert]
     getDesertById(id: ID!): Desert
@@ -99,9 +89,9 @@ const resolvers = {
             return -1;
           } else if (a[key] > b[key]) {
             return 1;
-          } else {
-            return 0;
           }
+
+          return 0;
         });
 
         return result;
@@ -131,11 +121,13 @@ const resolvers = {
     deleteDeserts: (parent, args) => {
       const { idOfDeserts } = args;
 
-      deserts.forEach((elem, key) => {
-        const { id } = elem;
+      idOfDeserts.forEach((idOfDesert) => {
+        const indexOfElement = deserts.findIndex(
+          (elem) => elem.id === idOfDesert
+        );
 
-        if (idOfDeserts.includes(id)) {
-          deserts.splice(key, 1);
+        if (indexOfElement !== -1) {
+          deserts.splice(indexOfElement, 1);
         }
       });
       return deserts;
